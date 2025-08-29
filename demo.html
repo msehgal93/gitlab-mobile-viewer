@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitLab MR Viewer - Demo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fab fa-gitlab"></i> GitLab MR Viewer</h1>
+            <p>View merge requests with your Personal Access Token</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Demo MR Content Section -->
+            <section class="mr-content" id="mrContent">
+                <div class="card">
+                    <div class="mr-header">
+                        <h2 id="mrTitle">Add user authentication feature</h2>
+                        <div class="mr-meta">
+                            <span class="mr-status mr-status">Open</span>
+                            <span class="mr-number" id="mrNumber">#42</span>
+                        </div>
+                    </div>
+
+                    <div class="mr-info">
+                        <div class="info-row">
+                            <span class="label">Author:</span>
+                            <span id="mrAuthor">John Developer</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Created:</span>
+                            <span id="mrCreated">Dec 15, 2024, 10:30 AM</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Updated:</span>
+                            <span id="mrUpdated">Dec 16, 2024, 02:15 PM</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Source Branch:</span>
+                            <span id="mrSourceBranch">feature/user-auth</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Target Branch:</span>
+                            <span id="mrTargetBranch">main</span>
+                        </div>
+                    </div>
+
+                    <div class="mr-description">
+                        <h3>Description</h3>
+                        <div id="mrDescription" class="description-content">
+                            <p>This merge request implements user authentication functionality for the web application.</p>
+                            <p><strong>Features added:</strong></p>
+                            <ul>
+                                <li>User registration and login forms</li>
+                                <li>JWT token-based authentication</li>
+                                <li>Password hashing with bcrypt</li>
+                                <li>Protected route middleware</li>
+                            </ul>
+                            <p><em>Testing:</em> All authentication flows have been tested manually and with unit tests.</p>
+                            <p><code>npm test</code> passes successfully.</p>
+                        </div>
+                    </div>
+
+                    <div class="mr-actions">
+                        <button class="btn btn-primary" id="openInGitlabBtn">
+                            <i class="fas fa-external-link-alt"></i> Open in GitLab
+                        </button>
+                        <button class="btn btn-secondary" id="newMrBtn">
+                            <i class="fas fa-plus"></i> New MR
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Demo Info Section -->
+            <section class="card">
+                <h2><i class="fas fa-info-circle"></i> Demo Mode</h2>
+                <p>This is a demo showing how the GitLab MR Viewer looks with sample data. To use the actual application:</p>
+                <ol style="margin-left: 20px; margin-top: 15px;">
+                    <li>Open <code>index.html</code> in your browser</li>
+                    <li>Enter your GitLab Personal Access Token</li>
+                    <li>Paste a merge request URL</li>
+                    <li>View the actual MR details</li>
+                </ol>
+                <div style="margin-top: 20px;">
+                    <a href="index.html" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> Launch Real App
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 GitLab MR Viewer. Built with ❤️ for developers.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Demo functionality
+        document.getElementById('openInGitlabBtn').addEventListener('click', () => {
+            alert('This would open the actual MR in GitLab when using the real application.');
+        });
+        
+        document.getElementById('newMrBtn').addEventListener('click', () => {
+            alert('This would allow you to enter a new MR URL when using the real application.');
+        });
+    </script>
+</body>
+</html>

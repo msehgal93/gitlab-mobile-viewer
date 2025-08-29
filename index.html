@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitLab MR Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fab fa-gitlab"></i> GitLab MR Viewer</h1>
+            <p>View merge requests with your Personal Access Token</p>
+        </header>
+
+        <main class="main-content">
+            <!-- PAT Input Section -->
+            <section class="pat-section" id="patSection">
+                <div class="card">
+                    <h2><i class="fas fa-key"></i> Personal Access Token</h2>
+                    <p>Enter your GitLab Personal Access Token to view merge requests. This will be saved locally for future use.</p>
+                    
+                    <div class="input-group">
+                        <label for="patInput">Personal Access Token:</label>
+                        <div class="input-with-toggle">
+                            <input 
+                                type="password" 
+                                id="patInput" 
+                                placeholder="glpat-xxxxxxxxxxxxxxxxxxxx"
+                                autocomplete="off"
+                            >
+                            <button type="button" class="toggle-password" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="gitlabUrl">GitLab Instance URL (optional):</label>
+                        <input 
+                            type="url" 
+                            id="gitlabUrl" 
+                            placeholder="https://gitlab.com"
+                            value="https://gitlab.com"
+                        >
+                    </div>
+
+                    <button class="btn btn-primary" id="savePatBtn">
+                        <i class="fas fa-save"></i> Save Token
+                    </button>
+                </div>
+            </section>
+
+            <!-- MR URL Input Section -->
+            <section class="mr-section" id="mrSection" style="display: none;">
+                <div class="card">
+                    <h2><i class="fas fa-code-branch"></i> Merge Request URL</h2>
+                    <p>Enter the GitLab merge request URL to view its details.</p>
+                    
+                    <div class="input-group">
+                        <label for="mrUrlInput">Merge Request URL:</label>
+                        <input 
+                            type="url" 
+                            id="mrUrlInput" 
+                            placeholder="https://gitlab.com/group/project/-/merge_requests/123"
+                        >
+                    </div>
+
+                    <button class="btn btn-primary" id="viewMrBtn">
+                        <i class="fas fa-eye"></i> View MR
+                    </button>
+
+                    <button class="btn btn-secondary" id="changePatBtn">
+                        <i class="fas fa-edit"></i> Change Token
+                    </button>
+                    
+                    <!-- Debug Info (hidden by default) -->
+                    <details class="debug-info" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e1e8ed;">
+                        <summary style="cursor: pointer; font-weight: 600; color: #666;">🔧 Debug Information</summary>
+                        <div style="margin-top: 10px; font-family: monospace; font-size: 0.9em;">
+                            <p><strong>GitLab URL:</strong> <span id="debugGitlabUrl">-</span></p>
+                            <p><strong>PAT Status:</strong> <span id="debugPatStatus">-</span></p>
+                            <p><strong>Parsed Project:</strong> <span id="debugProjectPath">-</span></p>
+                            <p><strong>Parsed MR ID:</strong> <span id="debugMrId">-</span></p>
+                            <div style="margin-top: 15px;">
+                                <button class="btn btn-secondary" id="testProjectAccessBtn" style="font-size: 0.9em; padding: 8px 16px;">
+                                    <i class="fas fa-vial"></i> Test Project Access
+                                </button>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Loading Section -->
+            <section class="loading-section" id="loadingSection" style="display: none;">
+                <div class="card">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading merge request...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MR Content Section -->
+            <section class="mr-content" id="mrContent" style="display: none;">
+                <div class="card">
+                    <div class="mr-header">
+                        <h2 id="mrTitle">Merge Request Title</h2>
+                        <div class="mr-meta">
+                            <span class="mr-status" id="mrStatus">Open</span>
+                            <span class="mr-number" id="mrNumber">#123</span>
+                        </div>
+                    </div>
+
+                    <div class="mr-info">
+                        <div class="info-row">
+                            <span class="label">Author:</span>
+                            <span id="mrAuthor">Author Name</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Created:</span>
+                            <span id="mrCreated">2024-01-01</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Updated:</span>
+                            <span id="mrUpdated">2024-01-01</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Source Branch:</span>
+                            <span id="mrSourceBranch">feature-branch</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Target Branch:</span>
+                            <span id="mrTargetBranch">main</span>
+                        </div>
+                    </div>
+
+                    <div class="mr-description">
+                        <h3>Description</h3>
+                        <div id="mrDescription" class="description-content">
+                            <!-- MR description will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- MR Approval Section -->
+                    <div class="mr-approval-section">
+                        <h3><i class="fas fa-check-circle"></i> Review & Approval</h3>
+                        <div class="approval-status" id="approvalStatus">
+                            <p id="approvalText">Loading approval status...</p>
+                            <div class="approval-actions" id="approvalActions">
+                                <button class="btn btn-success" id="approveMrBtn">
+                                    <i class="fas fa-thumbs-up"></i> Approve
+                                </button>
+                                <button class="btn btn-warning" id="unapproveMrBtn" style="display: none;">
+                                    <i class="fas fa-thumbs-down"></i> Unapprove
+                                </button>
+                                <button class="btn btn-primary" id="mergeMrBtn">
+                                    <i class="fas fa-code-branch"></i> Merge MR
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Changes Section -->
+                    <div class="mr-changes-section">
+                        <h3><i class="fas fa-code"></i> Code Changes</h3>
+                        <div class="changes-summary" id="changesSummary">
+                            <p>Loading changes...</p>
+                        </div>
+                        <div class="changes-content" id="changesContent">
+                            <!-- File diffs will be rendered here -->
+                        </div>
+                        <button class="btn btn-secondary" id="loadChangesBtn">
+                            <i class="fas fa-download"></i> Load Code Diff
+                        </button>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="mr-comments-section">
+                        <h3><i class="fas fa-comments"></i> Comments</h3>
+                        <div class="add-comment">
+                            <textarea id="newCommentText" placeholder="Add a comment..." rows="3"></textarea>
+                            <button class="btn btn-primary" id="addCommentBtn">
+                                <i class="fas fa-paper-plane"></i> Add Comment
+                            </button>
+                        </div>
+                        <div class="comments-list" id="commentsList">
+                            <!-- Comments will be rendered here -->
+                        </div>
+                    </div>
+
+                    <div class="mr-actions">
+                        <button class="btn btn-primary" id="openInGitlabBtn">
+                            <i class="fas fa-external-link-alt"></i> Open in GitLab
+                        </button>
+                        <button class="btn btn-secondary" id="newMrBtn">
+                            <i class="fas fa-plus"></i> New MR
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Section -->
+            <section class="error-section" id="errorSection" style="display: none;">
+                <div class="card error-card">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Error</h2>
+                    <p id="errorMessage">An error occurred while processing your request.</p>
+                    <button class="btn btn-primary" id="retryBtn">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 GitLab MR Viewer. Built with <span class="heart-container"><span class="heart" id="heartIcon">❤️</span></span> for developers.</p>
+            <div class="love-message" id="loveMessage">Shriya and Mohit</div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
